@@ -5,6 +5,7 @@
  */
 package UserInterface;
 
+import Business.Abstract.User;
 import Business.Users.Admin;
 import Business.Users.Customer;
 import Business.Users.Supplier;
@@ -31,6 +32,7 @@ public class AdminCreateScreen extends javax.swing.JPanel {
      */
     private JPanel panelRight;
     private Admin admin;
+
     public AdminCreateScreen(JPanel panelRight, Admin admin) {
         initComponents();
         this.panelRight = panelRight;
@@ -142,11 +144,72 @@ public class AdminCreateScreen extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
-        // TODO add your handling code here:
-        // 输入校验
-        // 身份判定
-        // 创建对象
-        // 加入字典
+        // 1. initialize components color
+        jLabel1.setForeground(Color.black);
+        jLabel2.setForeground(Color.black);
+        jLabel3.setForeground(Color.black);
+        txtUser.setForeground(Color.black);
+        txtPword.setForeground(Color.black);
+        txtRePword.setForeground(Color.black);
+        radioCustomer.setForeground(Color.black);
+        radioSupplier.setForeground(Color.black);
+        // 2. validate user name & password
+        // 2.1 validate user name by Pattern & Matcher
+        String username = txtUser.getText();
+        Pattern regex = Pattern.compile("^[a-z0-9A-Z]+_[a-z0-9A-Z]+@[a-z0-9A-Z]+\\.[a-z0-9A-Z]+$");
+        Matcher matcher = regex.matcher(username);
+        boolean isMatched = matcher.matches();
+        if (!isMatched) {
+            // if not matched, change the color and show message dialog.
+            jLabel1.setForeground(Color.red);
+            txtUser.setForeground(Color.red);
+            JOptionPane.showMessageDialog(null, "Please enter correct email");
+            return;
+        }
+        // 2.2 validate password by Pattern & Matcher
+        String pwd = txtPword.getText();
+        regex = Pattern.compile("^(?![A-Za-z0-9]+$)(?![a-z0-9\\W]+$)(?![A-Za-z\\W]+$)(?![A-Z0-9\\W]+$)[a-zA-Z0-9\\$\\*#&]{6,}$");
+        matcher = regex.matcher(pwd);
+        isMatched = matcher.matches();
+        if (!isMatched) {
+            // if not matched, change the color and show message dialog.
+            jLabel2.setForeground(Color.red);
+            txtPword.setForeground(Color.red);
+            JOptionPane.showMessageDialog(null, "Please enter correct password");
+            return;
+        }
+        // 2.3 validate re-enter password
+        String pwd2 = txtRePword.getText();
+        isMatched = pwd2.equals(pwd);
+        if (!isMatched) {
+            // if not matched, change the color and show message dialog.
+            jLabel3.setForeground(Color.red);
+            txtRePword.setForeground(Color.red);
+            JOptionPane.showMessageDialog(null, "Please re-enter correct password");
+            return;
+        }
+        // 2.4 validate user role
+        if (!radioCustomer.isSelected() && !radioSupplier.isSelected()) {
+            radioCustomer.setForeground(Color.red);
+            radioSupplier.setForeground(Color.red);
+            JOptionPane.showMessageDialog(null, "Please check user role");
+            return;
+        }
+        // 3. create user & add user to admin's directory
+        User user;
+        if (radioCustomer.isSelected()) {
+            user = new Customer(pwd, username);
+            admin.getCustDir().getCustomerList().add(user);
+        } else {
+            user = new Supplier(pwd, username);
+            admin.getSuppDir().getSupplierList().add(user);
+        }
+        JOptionPane.showMessageDialog(null, "Successful!");
+        // 4. show the SuccessScreen
+        CardLayout layout = (CardLayout)panelRight.getLayout();
+        panelRight.remove(this);
+        panelRight.add(new SuccessScreen(user));
+        layout.next(panelRight);
     }//GEN-LAST:event_btnCreateActionPerformed
 
     private void radioCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioCustomerActionPerformed
@@ -155,13 +218,12 @@ public class AdminCreateScreen extends javax.swing.JPanel {
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
 
-        CardLayout layout = (CardLayout)panelRight.getLayout();
+        CardLayout layout = (CardLayout) panelRight.getLayout();
         panelRight.remove(this);
         layout.previous(panelRight);
     }//GEN-LAST:event_btnBackActionPerformed
 
-    
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnCreate;

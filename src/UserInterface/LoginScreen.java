@@ -24,6 +24,7 @@ public class LoginScreen extends javax.swing.JPanel {
      */
     List<User> list;
     JPanel panelRight;
+
     public LoginScreen(JPanel panelRight, List<User> list) {
         initComponents();
         this.list = list;
@@ -91,20 +92,48 @@ public class LoginScreen extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmitActionPerformed
-        // TODO add your handling code here:
-        // 校验身份
-        // 切换panel
+        // verify password
+        User user = (User) comboUser.getSelectedItem();
+        String pwd = txtPword.getText();
+        boolean correct = user.verify(pwd);
+        if (correct) {
+            // show SuccessScreen
+            CardLayout layout = (CardLayout) panelRight.getLayout();
+            panelRight.remove(this);
+            panelRight.add(new SuccessScreen(user));
+            layout.next(panelRight);
+        } else {
+            // show message
+            JOptionPane.showMessageDialog(null, "Please enter correct password");
+        }
     }//GEN-LAST:event_btnSubmitActionPerformed
 
-    
-    private void initialize(){
+    private void initialize() {
+        txtTitle.setText("Unknown Login Screen");
+        comboUser.removeAllItems();
+        // handle empty list
+        if (list.size() == 0) {
+            // show message dialog
+            JOptionPane.showMessageDialog(null, "Please create user");
+            btnSubmit.setEnabled(false);
+            return;
+        }
         //text should either be "Supplier Login Screen" OR "Customer Login Screen"
         //Based on the selection
-        txtTitle.setText("****** Login Screen");
-        comboUser.removeAllItems();
+        String role = list.get(0).getRole();
+        if (role.equals(new Customer("", "").getRole())) {
+            txtTitle.setText("Customer Login Screen");
+        } else {
+            txtTitle.setText("Supplier Login Screen");
+        }
         //only customer or suppliers should be listed based on the selection
+        for (User user : list) {
+            comboUser.addItem(user);
+        }
+        // set first user as default selected user
+        comboUser.setSelectedIndex(0);
     }
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSubmit;
