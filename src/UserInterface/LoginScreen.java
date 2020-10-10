@@ -96,6 +96,7 @@ public class LoginScreen extends javax.swing.JPanel {
         User user = (User) comboUser.getSelectedItem();
         String pwd = txtPword.getText();
         boolean correct = user.verify(pwd);
+        
         if (correct) {
             // show SuccessScreen
             CardLayout layout = (CardLayout) panelRight.getLayout();
@@ -111,6 +112,7 @@ public class LoginScreen extends javax.swing.JPanel {
     private void initialize() {
         txtTitle.setText("Unknown Login Screen");
         comboUser.removeAllItems();
+        
         // handle empty list
         if (list.size() == 0) {
             // show message dialog
@@ -118,6 +120,7 @@ public class LoginScreen extends javax.swing.JPanel {
             btnSubmit.setEnabled(false);
             return;
         }
+        
         //text should either be "Supplier Login Screen" OR "Customer Login Screen"
         //Based on the selection
         String role = list.get(0).getRole();
@@ -126,10 +129,12 @@ public class LoginScreen extends javax.swing.JPanel {
         } else {
             txtTitle.setText("Supplier Login Screen");
         }
+        
         //only customer or suppliers should be listed based on the selection
         for (User user : list) {
             comboUser.addItem(user);
         }
+        
         // set first user as default selected user
         comboUser.setSelectedIndex(0);
     }
